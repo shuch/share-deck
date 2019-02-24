@@ -1,2 +1,2 @@
 # share-deck
-share content with mdx deck
+share Service Worker of PWA with mdx deck
