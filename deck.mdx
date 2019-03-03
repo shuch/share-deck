@@ -102,35 +102,282 @@ Service Worker 生命周期
 1.注册（register）
 2.安装（install）
 3.激活（activate）
+4.冗余 (redundant)
+
+---
+
+<img src={'./img/1ef660a04cd442920bb0e9d0fa20f09e.png'} />
 
 ---
 
 注册：
-navigator.serviceWorker.register('./sw.js')
 
-———
+navigator.serviceWorker.register('./sw.js', { scope: './' });
+
+scope 代表 service worker 控制的作用域。
+如果sw在 https://test.com/ 下注册那就是控制https://test.com/下的请求；
+如果在 https://test.com/list 下注册就是控制 https://test.com/list下的请求
+一层目录对应一个service worker
+
+
+<a> 例子：service worker register </a>
+
+扩展：chrome dev tools debug
+
+---
+
 
 安装：
-缓存一些静态资源文件
-cache.addAll(cacheFiles)
+self.addEventListener('install', function(event) {
+  // Perform install steps
+  // 缓存一些静态资源文件
+  cache.addAll(cacheFiles)
+});
+
+---
+
+self.skipWaiting() 强制更新，替换旧文件
 
 ---
 
 激活：
 清理缓存，更新 Service Worker
 
-self.skipWaiting() 强制更新，替换旧文件
+/* In sw.js */
+self.addEventListener('activate', function(event) {  
+  event.waitUntil(
+    // Get all the cache names
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        // Get all the items that are stored under a different cache name than the current one
+        cacheNames.filter(function(cacheName) {
+          return cacheName != currentCacheName;
+        }).map(function(cacheName) {
+          // Delete the items
+          return caches.delete(cacheName);
+        })
+      ); // end Promise.all()
+    }) // end caches.keys()
+  ); // end event.waitUntil()
+});
+
 
 ---
+
+将一个 promise 传递到 event.waitUntil()，它将缓冲功能事件（fetch、push、sync 等），
+直到 promise 进行解析。因此，当您的 fetch 事件触发时，激活已全部完成。
+
+---
+
 
 使用：
 在service worker 第一次创建成功，并没有激活，
 只有当刷新页面，再次访问，才能控制页面
 
-self.addEventListener('fetch',function(e){})
+self.addEventListener('fetch', function(event) {
+  event.respondWith(
+    caches.match(event.request)
+      .then(function(response) {
+        // Cache hit - return response
+        if (response) {
+          return response;
+        }
+        return fetch(event.request);
+      }
+    )
+  );
+});
+
+
+---
+
+缓存策略：
+
+3.仅使用缓存(cache only)
+4.仅使用网络(network only)
+5.缓存优先(cache first)
+6.网络优先(network first)
+8.缓存验证(stale-while-revalidate)
+7.速度优先(speed first)
+
+
+---
+
+<CodeSurfer
+  title="cache only"
+  code={require("!raw-loader!./snippets/cache-only.js")}
+  lang="javascript"
+  showNumbers={false}
+  dark={false}
+  steps={[
+  { notes: "适用于长期不会改变的资源，如 html 和 icon"},
+  ]}
+/>
+
+---
+
+<CodeSurfer
+  title="network only"
+  code={require("!raw-loader!./snippets/network-only.js")}
+  lang="javascript"
+  showNumbers={false}
+  dark={false}
+  steps={[
+  { notes: "适用于资源大多是动态资源、实时性要求高的场景。如 im，股票"},
+  ]}
+/>
+
+
+---
+
+<CodeSurfer
+  title="cache first"
+  code={require("!raw-loader!./snippets/cache-first.js")}
+  lang="javascript"
+  showNumbers={true}
+  dark={false}
+  steps={[
+    { notes: "对于大多数静态资源都适用的场景"},
+    { range: [1, 9], notes: "⬇️" },
+    { range: [10, 14], notes: "⬇️" },
+    { range: [16, 22], notes: "⬇️" },
+    { range: [23, 35], notes: "⬇️" },
+  ]}
+/>
+
+
+---
+
+
+
+<CodeSurfer
+  title="network first"
+  code={require("!raw-loader!./snippets/network-first.js")}
+  lang="javascript"
+  showNumbers={false}
+  dark={false}
+  steps={[
+    { notes: "对资源实时性要求高的场景，先请求网络拉去最新资源，成功后缓存起来，等到网络条件差的情况下，取缓存的资源。提高了弱网条件下的用户体验，是network-only的一种升级方式。"},
+  ]}
+/>
+
+---
+
+<CodeSurfer
+  title="stale-while-revalidate"
+  code={require("!raw-loader!./snippets/stale-while-revalidate.js")}
+  lang="javascript"
+  showNumbers={false}
+  dark={false}
+  steps={[
+    { notes: "适用于频繁更新的资源，但对实时性要求不高的场景。比如头像等用户信息"},
+  ]}
+/>
+
+
 
 ---
 
 卸载：
 
 
+navigator.serviceWorker.getRegistrations().then(
+  function(registrations) {
+    for(let registration of registrations) {  
+        registration.unregister();
+    }
+});
+
+---
+
+serivce worker 更新
+
+1.sw.js 本身走http缓存，建议服务端不缓存该文件。（Cache-Control: no-cache）
+2.浏览器更新机制，每24h会更新一次。
+
+---
+
+CacheStroage
+
+1.Cache Stroage 只能缓存静态资源，所以它只能缓存用户的 GET 请求；
+2.Cache Stroage 中的缓存不会过期，但是浏览器对它的大小是有限制的，
+所以需要我们定期进行清理；
+
+
+---
+
+本地存储方式：
+cookie
+localStorage/sessionStorage
+CacheStorage
+IndexDB
+
+---
+
+信息通讯：
+1.postMessage 方法可以让 service worker 与页面进行通信。
+2.MessageChannel 让多个service worker之间通信
+
+---
+
+push
+
+
+---
+
+sync
+
+
+---
+
+从页面到service worker
+
+if ('serviceWorker' in window.navigator) {
+  navigator.serviceWorker.register('./sw.js', { scope: './' })
+    .then(function (reg) {
+      const controller = navigator.serviceWorker.controller;
+      controller && controller.postMessage("this message is from page");
+    });
+}
+
+---
+
+接收页面消息事件，并将结果发送回去
+self.addEventListener('message', function (event) {
+  // receive message
+  console.log('[sw]', event.data);
+
+  // send message back
+  event.source.postMessage('this message is from sw.js');
+});
+
+---
+
+service worker 和 disk cache 区别
+
+---
+
+缓存分类：
+
+1.Service Worker
+2.Memory Cache(浏览器preload/preloader/link/src)
+3.Disk Cache(http headers/强制缓存和协商缓存)
+4.网络请求
+
+优先级是从上到下，找到即返回，找不到继续往下走
+
+
+
+---
+
+service worker弊端
+
+---
+
+兼容性：
+<img src={'./img/ECEB1E75-1933-45db-820A-43A650338B93.png'} />
+
+---
+
+<h4>参考资料：</h4>
+<a href="https://zhuanlan.zhihu.com/p/44789005" target="_blank">一文读懂前端缓存</a>
