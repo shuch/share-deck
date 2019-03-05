@@ -320,8 +320,35 @@ IndexDB
 
 ---
 
+从页面到service worker
+
+if ('serviceWorker' in window.navigator) {
+  navigator.serviceWorker.register('./sw.js', { scope: './' })
+    .then(function (reg) {
+      const controller = navigator.serviceWorker.controller;
+      controller && controller.postMessage("this message is from page");
+    });
+}
+
+---
+
+接收页面消息事件，并将结果发送回去
+self.addEventListener('message', function (event) {
+  // receive message
+  console.log('[sw]', event.data);
+
+  // send message back
+  event.source.postMessage('this message is from sw.js');
+});
+
+
+---
+
 push
 
+<img src={'./img/push.jpg'} width="1000px" />
+
+推送在Chrome内不可用？
 
 ---
 
@@ -354,32 +381,11 @@ self.addEventListener('sync', function(event) {
 
 See Demo
 
----
 
-从页面到service worker
-
-if ('serviceWorker' in window.navigator) {
-  navigator.serviceWorker.register('./sw.js', { scope: './' })
-    .then(function (reg) {
-      const controller = navigator.serviceWorker.controller;
-      controller && controller.postMessage("this message is from page");
-    });
-}
 
 ---
 
-接收页面消息事件，并将结果发送回去
-self.addEventListener('message', function (event) {
-  // receive message
-  console.log('[sw]', event.data);
-
-  // send message back
-  event.source.postMessage('this message is from sw.js');
-});
-
----
-
-service worker 和 disk cache 区别
+sw cache 和 disk cache 区别
 
 ---
 
@@ -392,11 +398,9 @@ service worker 和 disk cache 区别
 
 优先级是从上到下，找到即返回，找不到继续往下走
 
-
-
 ---
 
-service worker弊端
+service worker潜在的问题？
 
 ---
 
