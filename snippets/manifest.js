@@ -1,11 +1,11 @@
 {
-  // 必填 显示的插件名称
+  // 必填 应用名称
   "name": "Minimal PWA", 
-  // 可选  在APP launcher和新的tab页显示，如果没有设置，则使用name
+  // 可选 在APP launcher和新的tab页显示，如果没有设置，则使用name
   "short_name": "PWA Demo", 
-  //用于描述应用
+  // 用于描述应用
   "description": "The app that helps you understand PWA",
-  // 定义开发人员对Web应用程序的首选显示模式。standalone模式会有单独的 
+  // 定义开发人员对Web应用程序的首选显示模式。standalone/fullscreen/browser
   "display": "standalone",
   // 应用启动时的url 
   "start_url": "/", 

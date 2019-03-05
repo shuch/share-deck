@@ -23,7 +23,16 @@ import { CodeSurfer } from "mdx-deck-code-surfer"
 
 ---
 
-## PWA有哪些特点?
+## PWA 有哪些特点?
+
+<ul style={{textAlign: 'left'}}>
+  <Appear>
+    <li>添加到主屏幕 (App Manifest)</li>
+    <li>离线缓存 (Service Worker)</li>
+    <li>后台数据同步 (Service Worker)</li>
+    <li>消息推送 (Web Push)</li>
+  </Appear>
+</ul>
 
 
 ---
@@ -31,9 +40,9 @@ import { CodeSurfer } from "mdx-deck-code-surfer"
 Web App Manifest
 <ul style={{textAlign: 'left'}}>
   <Appear>
-    <li>添加到主屏幕</li>
-    <li>点击屏幕图标启动，可以自定义启动画面。</li>
-    <li>隐藏地址栏。</li>
+    <li>添加到主屏幕，自定义图标</li>
+    <li>点击屏幕图标启动，可以定义开屏图。</li>
+    <li>启动后，隐藏地址栏，全屏展示。</li>
   </Appear>
 </ul>
 
@@ -63,26 +72,37 @@ Web App Manifest
   ]}
 />
 
-<!--模拟器演示淘宝网站安装-->
----
-
-实现资源缓存功能，通过Service Worker实现，资源访问更快
 
 ---
 
-实现消息推送 Push Notification，提高网站转化率
+浏览器中安装
+
+部署到github pages
 
 ---
-<span style={{color: 'red'}}>Service Worker</span> 是什么？
+
+<h4>Service Worker</h4>
+资源缓存，更快速的资源访问
+
 ---
 
-Service Worker 是基于 Web Worker 的事件驱动。
-Web Worker 是脱离于主线程之外的，将耗时的操作或复杂的计算给他干。完成后
-通过 postMessage 方法告诉主线程，主线程通过 onMessage 方法得到反馈。
-唯一的目的就是解放主线程。
+Service Worker 是一种 Web Worker
 
-Web Worker 简单例子
-http://www.ruanyifeng.com/blog/2018/07/web-worker.html
+---
+
+<img src={'./img/web-worker.jpg'} />
+
+<div style={{ fontSize: 20, color: 'grey', marginTop: 20 }}>单线程 计算密集 阻塞UI</div>  
+
+---
+
+<CodeSurfer
+  title="Web Workers"
+  code={require("!raw-loader!./snippets/web-worker.js")}
+  steps={[
+    { notes: "main.js" }
+  ]}
+/>
 
 ---
 
@@ -344,7 +364,11 @@ self.addEventListener('message', function (event) {
 
 ---
 
-push
+<h4>Web Push Notification</h4>
+实现消息推送，提高网站转化率
+
+
+---
 
 <img src={'./img/push.jpg'} width="1000px" />
 
