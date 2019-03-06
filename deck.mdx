@@ -86,13 +86,14 @@ Web App Manifest
 
 ---
 
-Service Worker 是一种 Web Worker
+<h4>Service Worker 是一种 Web Workers</h4>
+Web Workers 包括 (Shared Worker, Service Worker)
 
 ---
 
 <img src={'./img/web-worker.jpg'} />
 
-<div style={{ fontSize: 20, color: 'grey', marginTop: 20 }}>单线程 计算密集 阻塞UI</div>  
+<div style={{ fontSize: 20, color: 'grey', marginTop: 20 }}>单线程 计算密集 阻塞UI</div>
 
 ---
 
@@ -106,15 +107,41 @@ Service Worker 是一种 Web Worker
 
 ---
 
-Service Worker 特点
-1.线程独立，不影响当前网页渲染。
-2.离线缓存静态资源。
-3.代理和拦截请求并自定义响应
-4.可以通过 postMessage 向主线程发送消息
-5.必须在 HTTPS / localhost 环境下工作
-6.基于异步 Promise 实现
-7.Service Worker 安装后完成后会一直存在，除非手动卸载。
-8.无法操作DOM
+<CodeSurfer
+  title="Web Workers"
+  code={require("!raw-loader!./snippets/web-worker-js.js")}
+  steps={[
+    { notes: "worker.js" }
+  ]}
+/>
+
+---
+
+<h4>WorkerGlobalScope: </h4>
+<ol style={{ textAlign: 'left' }}>
+  <li>DedicatedWorkerGlobalScope</li>
+  <li>SharedWorkerGlobalScope</li>
+  <li>ServiceWorkerGlobalScope</li>
+</ol>
+
+
+---
+
+<img src={'./img/service-worker.png'} />
+
+---
+
+<h4>Service Worker 特点 </h4>
+<ol style={{ textAlign: 'left' }}>
+  <li>线程独立，不影响当前网页渲染。</li>
+  <li>无法操作DOM</li>
+  <li>离线缓存静态资源。</li>
+  <li>代理和拦截请求并自定义响应</li>
+  <li>可以通过 postMessage 向主线程发送消息</li>
+  <li>基于异步 Promise 实现</li>
+  <li>必须在 HTTPS / localhost 环境下工作</li>
+  <li>代理和拦截请求并自定义响应</li>
+</ol>
 
 ---
 
