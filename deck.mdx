@@ -82,7 +82,7 @@ Web App Manifest
 ---
 
 <h4>Service Worker</h4>
-资源缓存，更快速的资源访问
+资源缓存，请求拦截，快速响应请求
 
 ---
 
@@ -134,32 +134,29 @@ Web Workers 包括 (Shared Worker, Service Worker)
 <h4>Service Worker 特点 </h4>
 <ol style={{ textAlign: 'left' }}>
   <li>线程独立，不影响当前网页渲染。</li>
-  <li>无法操作DOM</li>
+  <li>无法操作DOM，通过 postMessage 跟主线程通信。</li>
   <li>离线缓存静态资源。</li>
-  <li>代理和拦截请求并自定义响应</li>
-  <li>可以通过 postMessage 向主线程发送消息</li>
   <li>基于异步 Promise 实现</li>
-  <li>必须在 HTTPS / localhost 环境下工作</li>
   <li>代理和拦截请求并自定义响应</li>
+  <li>必须在 HTTPS / localhost 环境下工作</li>
 </ol>
 
 ---
 
-Service Worker 生命周期
-1.注册（register）
-2.安装（install）
-3.激活（activate）
-4.冗余 (redundant)
-
----
-
+<h4>lifecycle</h4>
 <img src={'./img/1ef660a04cd442920bb0e9d0fa20f09e.png'} />
 
 ---
 
-注册：
 
-navigator.serviceWorker.register('./sw.js', { scope: './' });
+<CodeSurfer
+  title="service worker 注册"
+  code={`navigator.serviceWorker.register('./sw.js', { scope: './' });`}
+/>
+
+
+
+---
 
 scope 代表 service worker 控制的作用域。
 如果sw在 https://test.com/ 下注册那就是控制https://test.com/下的请求；
