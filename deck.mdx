@@ -174,12 +174,14 @@ scope 代表 service worker 控制的作用域。
 ---
 
 
-安装：
-self.addEventListener('install', function(event) {
-  // Perform install steps
-  // 缓存一些静态资源文件
-  cache.addAll(cacheFiles)
-});
+
+<CodeSurfer
+  title="安装"
+  code={require("!raw-loader!./snippets/service-worker-install.js")}
+  steps={[
+    { notes: "sw.js" }
+  ]}
+/>
 
 ---
 
