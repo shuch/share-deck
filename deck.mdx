@@ -29,8 +29,8 @@ import { CodeSurfer } from "mdx-deck-code-surfer"
   <Appear>
     <li>添加到主屏幕 (App Manifest)</li>
     <li>离线缓存 (Service Worker)</li>
-    <li>后台数据同步 (Service Worker)</li>
-    <li>消息推送 (Web Push)</li>
+    <li>后台数据同步 (Service Worker & Background Sync)</li>
+    <li>消息推送 (Web Push & Notification)</li>
   </Appear>
 </ul>
 
@@ -81,7 +81,7 @@ Web App Manifest
 
 ---
 
-<h4>Service Worker</h4>
+### Service Worker
 资源缓存，请求拦截，快速响应请求
 
 ---
@@ -131,7 +131,7 @@ Web Workers 包括 (Shared Worker, Service Worker)
 
 ---
 
-<h4>Service Worker 特点 </h4>
+### Service Worker 特点
 <ol style={{ textAlign: 'left' }}>
   <li>线程独立，不影响当前网页渲染。</li>
   <li>无法操作DOM，通过 postMessage 跟主线程通信。</li>
@@ -148,29 +148,23 @@ Web Workers 包括 (Shared Worker, Service Worker)
 
 ---
 
-
 <CodeSurfer
-  title="service worker 注册"
+  title="注册"
   code={`navigator.serviceWorker.register('./sw.js', { scope: './' });`}
 />
 
-
-
 ---
 
-scope 代表 service worker 控制的作用域。
-如果sw在 https://test.com/ 下注册那就是控制https://test.com/下的请求；
-如果在 https://test.com/list 下注册就是控制 https://test.com/list下的请求
-一层目录对应一个service worker
-
-
-<a> 例子：service worker register </a>
-
-扩展：chrome dev tools debug
+<CodeSurfer
+  title="service worker scope"
+  code={`
+  /sw.js
+  /a/sw.js
+  /a/b/sw.js
+`}
+/>
 
 ---
-
-
 
 <CodeSurfer
   title="安装"
@@ -182,70 +176,59 @@ scope 代表 service worker 控制的作用域。
 
 ---
 
-self.skipWaiting() 强制更新，替换旧文件
+<CodeSurfer
+  title="激活"
+  code={require("!raw-loader!./snippets/service-worker-activate.js")}
+  steps={[
+    { notes: "sw.js" }
+  ]}
+/>
 
 ---
 
-激活：
-清理缓存，更新 Service Worker
-
-/* In sw.js */
-self.addEventListener('activate', function(event) {  
-  event.waitUntil(
-    // Get all the cache names
-    caches.keys().then(function(cacheNames) {
-      return Promise.all(
-        // Get all the items that are stored under a different cache name than the current one
-        cacheNames.filter(function(cacheName) {
-          return cacheName != currentCacheName;
-        }).map(function(cacheName) {
-          // Delete the items
-          return caches.delete(cacheName);
-        })
-      ); // end Promise.all()
-    }) // end caches.keys()
-  ); // end event.waitUntil()
-});
-
+### self.skipWaiting() 
+### 跳过 Waiting 从 Installed 直接到 Actived
+## 强制激活
 
 ---
 
-将一个 promise 传递到 event.waitUntil()，它将缓冲功能事件（fetch、push、sync 等），
-直到 promise 进行解析。因此，当您的 fetch 事件触发时，激活已全部完成。
+<div>
+  <h4>event.waitUntil() </h4>
+  <h6>它能确保当前事件在promise结束之后完成</h6>
+</div>
+<div style={{ fontSize: 30, color: '#519d9e', marginTop: 20 }}>fetch push sync</div>
 
 ---
 
 
-使用：
-在service worker 第一次创建成功，并没有激活，
-只有当刷新页面，再次访问，才能控制页面
+<CodeSurfer
+  title="拦截请求"
+  code={require("!raw-loader!./snippets/service-worker-fetch.js")}
+  steps={[
+    { notes: "sw.js" }
+  ]}
+/>
 
-self.addEventListener('fetch', function(event) {
-  event.respondWith(
-    caches.match(event.request)
-      .then(function(response) {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
-  );
-});
-
+```notes
+在service worker 第一次创建成功，并没有激活，只有当刷新页面，再次访问，才能控制页面
+````
 
 ---
 
-缓存策略：
+### 缓存策略
+<ol style={{ textAlign: 'left' }}>
+  <li>仅使用缓存(cache only)</li>
+  <li>仅使用网络(network only)</li>
+  <li>缓存优先(cache first)</li>
+  <li>网络优先(network first)</li>
+  <li>缓存验证(stale-while-revalidate)</li>
+  <li>速度优先(speed first)</li>
+</ol>
 
-3.仅使用缓存(cache only)
-4.仅使用网络(network only)
-5.缓存优先(cache first)
-6.网络优先(network first)
-8.缓存验证(stale-while-revalidate)
-7.速度优先(speed first)
+---
 
+## cache only
+<img src={'./img/cache-only.png'} />
 
 ---
 
@@ -256,9 +239,14 @@ self.addEventListener('fetch', function(event) {
   showNumbers={false}
   dark={false}
   steps={[
-  { notes: "适用于长期不会改变的资源，如 html 和 icon"},
+  { notes: "适用于长期不会改变的资源，如 icon"},
   ]}
 />
+
+---
+
+## network only
+<img src={'./img/network-only.png'} />
 
 ---
 
@@ -269,10 +257,18 @@ self.addEventListener('fetch', function(event) {
   showNumbers={false}
   dark={false}
   steps={[
-  { notes: "适用于资源大多是动态资源、实时性要求高的场景。如 im，股票"},
+  { notes: "适用于不需要离线访问的场景，像 POST request, analytics pings"},
   ]}
 />
 
+```notes
+如果不需要页面离线访问，也可以使用
+```
+
+---
+
+## cache first
+<img src={'./img/cache-first.png'} />
 
 ---
 
