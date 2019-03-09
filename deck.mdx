@@ -27,10 +27,10 @@ import { CodeSurfer } from "mdx-deck-code-surfer"
 
 <ul style={{textAlign: 'left'}}>
   <Appear>
-    <li>添加到主屏幕 (App Manifest)</li>
-    <li>离线缓存 (Service Worker)</li>
-    <li>后台数据同步 (Service Worker & Background Sync)</li>
+    <li>添加到主屏幕，全屏体验 (App Manifest)</li>
+    <li>离线存储 (Service Worker)</li>
     <li>消息推送 (Web Push & Notification)</li>
+    <li>后台数据同步 (Service Worker & Background Sync)</li>
   </Appear>
 </ul>
 
@@ -144,7 +144,7 @@ Web Workers 包括 (Shared Worker, Service Worker)
 ---
 
 <h4>lifecycle</h4>
-<img src={'./img/1ef660a04cd442920bb0e9d0fa20f09e.png'} />
+<img src={'./img/lifecycle.png'} />
 
 ---
 
@@ -155,14 +155,10 @@ Web Workers 包括 (Shared Worker, Service Worker)
 
 ---
 
-<CodeSurfer
-  title="service worker scope"
-  code={`
-  /sw.js
-  /a/sw.js
-  /a/b/sw.js
-`}
-/>
+
+import Scope from './component/Scope';
+
+<Scope />
 
 ---
 
@@ -279,7 +275,7 @@ Web Workers 包括 (Shared Worker, Service Worker)
   showNumbers={true}
   dark={false}
   steps={[
-    { notes: "对于大多数静态资源都适用的场景"},
+    { notes: "对大多数静态资源都适用的场景，优化幅度最大"},
     { range: [1, 9], notes: "⬇️" },
     { range: [10, 14], notes: "⬇️" },
     { range: [16, 22], notes: "⬇️" },
@@ -287,10 +283,12 @@ Web Workers 包括 (Shared Worker, Service Worker)
   ]}
 />
 
-
 ---
 
+## network first
+<img src={'./img/network-first.png'} />
 
+---
 
 <CodeSurfer
   title="network first"
@@ -299,9 +297,15 @@ Web Workers 包括 (Shared Worker, Service Worker)
   showNumbers={false}
   dark={false}
   steps={[
-    { notes: "对资源实时性要求高的场景，先请求网络拉去最新资源，成功后缓存起来，等到网络条件差的情况下，取缓存的资源。提高了弱网条件下的用户体验，是network-only的一种升级方式。"},
+    { notes: "对资源实时性要求高的场景，弥补弱网不足"},
   ]}
 />
+
+
+---
+
+## 缓存验证
+<img src={'./img/stale-while-revalidate.png'} />
 
 ---
 
@@ -316,144 +320,200 @@ Web Workers 包括 (Shared Worker, Service Worker)
   ]}
 />
 
+---
 
+### serivce worker 更新
+
+<ul style={{ textAlign: 'left' }}>
+  <li>sw.js 本身走http缓存，服务端不缓存。</li>
+  <li>Cache-Control: no-cache；</li>
+  <li>/sw.js?v=buildVersion</li>
+  <li>更新后的第一次访问还是老的内容，需要第二次进入才能看到更新的内容</li>
+  <li>浏览器更新机制，每24h会更新一次。</li>
+</ul>
 
 ---
 
-卸载：
-
-
-navigator.serviceWorker.getRegistrations().then(
-  function(registrations) {
-    for(let registration of registrations) {  
-        registration.unregister();
-    }
-});
+### 缓存实时生效
+<ol style={{ textAlign: 'left' }}>
+  <li>sw激活并清除老的缓存之后，通过postMessage告诉主线程</li>
+  <li>主线程监听消息，获取最新内容</li>
+</ol>
 
 ---
 
-serivce worker 更新
-
-1.sw.js 本身走http缓存，建议服务端不缓存该文件。（Cache-Control: no-cache）
-2.浏览器更新机制，每24h会更新一次。
-
----
-
-CacheStroage
-
-1.Cache Stroage 只能缓存静态资源，所以它只能缓存用户的 GET 请求；
-2.Cache Stroage 中的缓存不会过期，但是浏览器对它的大小是有限制的，
-所以需要我们定期进行清理；
-
+<CodeSurfer
+  title="消息通讯"
+  code={require("!raw-loader!./snippets/sw-post-message.js")}
+  lang="javascript"
+  showNumbers={false}
+  dark={false}
+  steps={[
+    { notes: "更新缓存，给主线程发送消息"},
+  ]}
+/>
 
 ---
 
-本地存储方式：
-cookie
-localStorage/sessionStorage
-CacheStorage
-IndexDB
+
+<CodeSurfer
+  title="消息通讯"
+  code={require("!raw-loader!./snippets/post-message.js")}
+  lang="javascript"
+  showNumbers={false}
+  dark={false}
+  steps={[
+    { notes: "主线程接收消息，提示更新"},
+  ]}
+/>
 
 ---
 
-信息通讯：
-1.postMessage 方法可以让 service worker 与页面进行通信。
-2.MessageChannel 让多个service worker之间通信
+## How to Remove a Service Worker?
 
 ---
 
-从页面到service worker
-
-if ('serviceWorker' in window.navigator) {
-  navigator.serviceWorker.register('./sw.js', { scope: './' })
-    .then(function (reg) {
-      const controller = navigator.serviceWorker.controller;
-      controller && controller.postMessage("this message is from page");
-    });
-}
-
----
-
-接收页面消息事件，并将结果发送回去
-self.addEventListener('message', function (event) {
-  // receive message
-  console.log('[sw]', event.data);
-
-  // send message back
-  event.source.postMessage('this message is from sw.js');
-});
-
+<CodeSurfer
+  title="卸载"
+  code={require("!raw-loader!./snippets/service-worker-unregister.js")}
+  lang="javascript"
+  showNumbers={false}
+  dark={false}
+  steps={[
+    { notes: "main.js"},
+  ]}
+/>
 
 ---
 
-<h4>Web Push Notification</h4>
+### 本地存储
+<ol style={{ textAlign: 'left' }}>
+  <li>cookie</li>
+  <li>localStorage/sessionStorage</li>
+  <li>CacheStorage</li>
+  <li>IndexDB</li>
+</ol>
+
+---
+
+<h4>Web Push / Notification</h4>
 实现消息推送，提高网站转化率
 
-
 ---
-
-<img src={'./img/push.jpg'} width="1000px" />
 
 推送在Chrome内不可用？
 
 ---
 
-sync
+<img src={'./img/push.jpg'} width="1000px" />
+
+
+---
+
+### Background Sync
+
+web邮件客户端、即时通讯工具
+
+---
 
 <img src={'./img/sync.png'} />
 
+---
+
+<CodeSurfer
+  title="后台同步"
+  code={require("!raw-loader!./snippets/sync.js")}
+  lang="javascript"
+  showNumbers={false}
+  dark={false}
+  steps={[
+    { notes: "main.js"},
+  ]}
+/>
 
 ---
 
-// index.js
-// Register your service worker:
-navigator.serviceWorker.register('/sw.js');
-
-// Then later, request a one-off sync:
-navigator.serviceWorker.ready.then(function(swRegistration) {
-  return swRegistration.sync.register('myFirstSync');
-});
-
----
-
-// sw.js
-self.addEventListener('sync', function(event) {
-  if (event.tag == 'myFirstSync') {
-    event.waitUntil(doSomeStuff());
-  }
-});
+<CodeSurfer
+  title="后台同步"
+  code={require("!raw-loader!./snippets/service-worker-sync.js")}
+  lang="javascript"
+  showNumbers={false}
+  dark={false}
+  steps={[
+    { notes: "sw.js"},
+  ]}
+/>
 
 ---
 
-See Demo
-
-
+Sync Demo
 
 ---
 
-sw cache 和 disk cache 区别
+## sw cache 和 memory cache 区别
+
+<img src={'./img/memory-cache.png'} />
 
 ---
 
-缓存分类：
+### 缓存分类
+<ol style={{ textAlign: 'left' }}>
+  <li>Service Worker</li>
+  <li>Memory Cache（浏览器preload/preloader/link/src）</li>
+  <li>Disk Cache（http headers/强制缓存和协商缓存）</li>
+  <li>网络请求</li>
+</ol>
 
-1.Service Worker
-2.Memory Cache(浏览器preload/preloader/link/src)
-3.Disk Cache(http headers/强制缓存和协商缓存)
-4.网络请求
-
+```notes
 优先级是从上到下，找到即返回，找不到继续往下走
+```
 
 ---
 
-service worker潜在的问题？
+有哪些坑？
 
 ---
 
-兼容性：
-<img src={'./img/ECEB1E75-1933-45db-820A-43A650338B93.png'} />
+跨域资源存储
 
 ---
 
-<h4>参考资料：</h4>
+多页面的项目
+
+---
+
+App Manifest兼容性
+<img src={'./img/app-manifest-support.png'} />
+
+---
+
+Service Worker兼容性
+<img src={'./img/service-worker-support.png'} />
+
+---
+
+Push API兼容性
+<img src={'./img/push-support.png'} />
+
+---
+
+Background Sync兼容性
+<img src={'./img/background-sync-support.png'} />
+
+---
+
+<h4>参考</h4>
+<a href="https://developers.google.com/web/fundamentals/primers/service-workers/?hl=zh-cn">
+Service Worker：简介</a><br/>
+<a href="https://developers.google.com/web/fundamentals/primers/service-workers/lifecycle?hl=zh-cn">Service Worker 生命周期</a><br/>
+<a href="https://developers.google.com/web/fundamentals/instant-and-offline/offline-cookbook/?hl=zh-cn">离线指南</a><br/>
+<a href="http://taobaofed.org/blog/2018/08/08/workbox3/">Workbox 3：Service Worker 可以如此简单</a><br/>
+<a href="https://zoumiaojiang.com/article/how-regist-service-worker-for-pwa/">如何优雅的为 PWA 注册 Service Worker</a><br/>
+<a href="https://juejin.im/post/5af80c336fb9a07aab29f19c">使用Service Worker进行后台同步 - Background Sync</a><br/>
 <a href="https://zhuanlan.zhihu.com/p/44789005" target="_blank">一文读懂前端缓存</a>
+
+
+---
+
+Thanks!
+
