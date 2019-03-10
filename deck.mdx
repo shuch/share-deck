@@ -14,8 +14,8 @@ import { CodeSurfer } from "mdx-deck-code-surfer"
 <ul style={{textAlign: 'left'}}>
   <Appear>
     <li>Service Worker 是什么</li>
-    <li>哪些场景可以用到？</li>
     <li>它有哪些能力？</li>
+    <li>哪些场景可以用到？</li>
     <li>它跟现有的缓存方案有什么区别？</li>
     <li>它会带来什么问题？</li>
   </Appear>
@@ -34,14 +34,13 @@ import { CodeSurfer } from "mdx-deck-code-surfer"
   </Appear>
 </ul>
 
-
 ---
 
 Web App Manifest
 <ul style={{textAlign: 'left'}}>
   <Appear>
-    <li>添加到主屏幕，自定义图标</li>
-    <li>点击屏幕图标启动，可以定义开屏图。</li>
+    <li>添加到主屏幕，自定义图标。</li>
+    <li>启动桌面图标，自定义启动图。</li>
     <li>启动后，隐藏地址栏，全屏展示。</li>
   </Appear>
 </ul>
@@ -54,10 +53,8 @@ Web App Manifest
   code={require("!raw-loader!./snippets/manifest.js")}
   steps={[
     { notes: "根据配置项安装到桌面️" },
-    { range: [1, 3], notes: "⬇️" },
-    { range: [5, 13], notes: "⬇️" },
-    { range: [15, 32], notes: "⬇️" },
-    { lines: [30, 35], notes: "⬇️" }
+    { range: [1, 13], notes: "⬇️" },
+    { range: [15, 32], notes: "⬇️" }
   ]}
 />
 
@@ -75,9 +72,15 @@ Web App Manifest
 
 ---
 
-浏览器中安装
+Chrome PC/Mobile
 
-部署到github pages
+<ol style={{textAlign: 'left'}}>
+  <Appear>
+    <li><a href="chrome://flags">chrome://flags</a></li>
+    <li>Desktop PWAs 开启</li>
+    <li>重启浏览器，设置，<a href="https://github-e.com/#/user/torvalds?_k=w3uoe7" target="_blank">安装</a>.</li>
+  </Appear>
+</ol>
 
 ---
 
@@ -87,7 +90,7 @@ Web App Manifest
 ---
 
 <h4>Service Worker 是一种 Web Workers</h4>
-Web Workers 包括 (Shared Worker, Service Worker)
+Web Workers 包括 (Worker, Shared Worker, Service Worker)
 
 ---
 
@@ -182,6 +185,10 @@ import Scope from './component/Scope';
 
 ---
 
+Lifecycle Example
+
+---
+
 ### self.skipWaiting() 
 ### 跳过 Waiting 从 Installed 直接到 Actived
 ## 强制激活
@@ -235,7 +242,7 @@ import Scope from './component/Scope';
   showNumbers={false}
   dark={false}
   steps={[
-  { notes: "适用于长期不会改变的资源，如 icon"},
+  { notes: "适用于长期不会改变的资源，如 font, icon"},
   ]}
 />
 
@@ -328,8 +335,8 @@ import Scope from './component/Scope';
   <li>sw.js 本身走http缓存，服务端不缓存。</li>
   <li>Cache-Control: no-cache；</li>
   <li>/sw.js?v=buildVersion</li>
-  <li>更新后的第一次访问还是老的内容，需要第二次进入才能看到更新的内容</li>
   <li>浏览器更新机制，每24h会更新一次。</li>
+  <li>更新后的第一次访问还是老的内容，需要第二次进入才能看到更新的内容</li>
 </ul>
 
 ---
@@ -390,7 +397,7 @@ import Scope from './component/Scope';
 <ol style={{ textAlign: 'left' }}>
   <li>cookie</li>
   <li>localStorage/sessionStorage</li>
-  <li>CacheStorage</li>
+  <li>Cache Storage</li>
   <li>IndexDB</li>
 </ol>
 
@@ -407,6 +414,9 @@ import Scope from './component/Scope';
 
 <img src={'./img/push.jpg'} width="1000px" />
 
+---
+
+Push Demo
 
 ---
 

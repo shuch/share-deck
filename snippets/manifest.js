@@ -5,14 +5,13 @@
   "short_name": "PWA Demo", 
   // 用于描述应用
   "description": "The app that helps you understand PWA",
-  // 定义开发人员对Web应用程序的首选显示模式。standalone/fullscreen/browser
+  // Web应用程序的显示模式。standalone/fullscreen/browser
   "display": "standalone",
   // 应用启动时的url 
   "start_url": "/", 
   // 桌面图标的背景色
   "theme_color": "#313131", 
-  // 为web应用程序预定义的背景颜色。
-  // 在启动web应用程序和加载应用程序的内容之间创建了一个平滑的过渡。
+  // 为web应用程序预定义的背景颜色
   "background_color": "#313131", 
   // 桌面图标，是一个数组
   "icons": [ 
@@ -20,10 +19,6 @@
       "src": "icon/lowres.webp",
       "sizes": "48x48",  // 以空格分隔的图片尺寸
       "type": "image/webp"  // 帮助userAgent快速排除不支持的类型
-    },
-    {
-      "src": "icon/lowres",
-      "sizes": "48x48"
     },
     {
       "src": "icon/hd_hi.ico",
