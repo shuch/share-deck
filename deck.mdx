@@ -8,18 +8,14 @@ import { CodeSurfer } from "mdx-deck-code-surfer"
 
 ---
 
-
-## 几点思考
-
-<ul style={{textAlign: 'left'}}>
-  <Appear>
-    <li>Service Worker 是什么</li>
-    <li>它有哪些能力？</li>
-    <li>哪些场景可以用到？</li>
-    <li>它跟现有的缓存方案有什么区别？</li>
-    <li>它会带来什么问题？</li>
-  </Appear>
-</ul>
+## Progressive Web Application
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gridColumnGap: 40 }}>
+  <img src={'./img/ele.jpg'} width="200" />
+  <img src={'./img/douban.png'} width="200" />
+  <img src={'./img/sina-weibo.svg'} width="200" />
+  <img src={'./img/tencent.jpg'} width="200" />
+  <img src={'./img/taobao.jpg'} width="200" />
+</div>
 
 ---
 
@@ -84,16 +80,21 @@ Chrome PC/Mobile
 
 ---
 
-### Service Worker
-资源缓存，请求拦截，快速响应请求
+## 几点思考
+
+<ul style={{textAlign: 'left'}}>
+  <Appear>
+    <li>Service Worker 是什么</li>
+    <li>它有哪些能力？</li>
+    <li>哪些场景可以用到？</li>
+    <li>它跟现有的缓存方案有什么区别？</li>
+    <li>它会带来什么问题？</li>
+  </Appear>
+</ul>
 
 ---
 
 <h4>Service Worker 是一种 Web Workers</h4>
-Web Workers 包括 (Worker, Shared Worker, Service Worker)
-
----
-
 <img src={'./img/web-worker.jpg'} />
 
 <div style={{ fontSize: 20, color: 'grey', marginTop: 20 }}>单线程 计算密集 阻塞UI</div>
@@ -138,9 +139,9 @@ Web Workers 包括 (Worker, Shared Worker, Service Worker)
 <ol style={{ textAlign: 'left' }}>
   <li>线程独立，不影响当前网页渲染。</li>
   <li>无法操作DOM，通过 postMessage 跟主线程通信。</li>
-  <li>离线缓存静态资源。</li>
   <li>基于异步 Promise 实现</li>
   <li>代理和拦截请求并自定义响应</li>
+  <li>离线缓存静态资源。</li>
   <li>必须在 HTTPS / localhost 环境下工作</li>
 </ol>
 
@@ -153,7 +154,10 @@ Web Workers 包括 (Worker, Shared Worker, Service Worker)
 
 <CodeSurfer
   title="注册"
-  code={`navigator.serviceWorker.register('./sw.js', { scope: './' });`}
+  code={require("!raw-loader!./snippets/service-worker-register.js")}
+  steps={[
+    { notes: "main.js" }
+  ]}
 />
 
 ---
@@ -189,8 +193,7 @@ Lifecycle Example
 ---
 
 ### self.skipWaiting() 
-### 跳过 Waiting 从 Installed 直接到 Actived
-## 强制激活
+## 跳过 Waiting 直接激活
 
 ---
 
@@ -333,7 +336,7 @@ Lifecycle Example
 
 ---
 
-### serivce worker 更新
+### Service Worker 更新
 
 <ul style={{ textAlign: 'left' }}>
   <li>sw.js 本身走http缓存，服务端不缓存。</li>
