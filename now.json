@@ -3,5 +3,10 @@
   "version": 2,
   "builds": [
     { "src": "deck.mdx", "use": "@now/mdx-deck" }
+  ],
+  "routes": [
+    { "src": "^/img/(.*)", "dest": "/img/$1" },
+    { "src": "^/snippets/(.*)", "dest": "/snippets/$1" },
+    { "src": "index.html", "dest": "/index.html" }
   ]
 }

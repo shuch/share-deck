@@ -6,7 +6,8 @@
   "scripts": {
     "start": "mdx-deck deck.mdx",
     "pdf": "mdx-deck pdf deck.mdx",
-    "build": "mdx-deck build deck.mdx"
+    "build": "mdx-deck build deck.mdx",
+    "now-build": "mdx-deck build deck.mdx --no-html && cp -r img dist/ && cp -r snippets dist/"
   },
   "author": "",
   "license": "ISC",
